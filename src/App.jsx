@@ -1,13 +1,13 @@
-import {useState} from 'react';
-import { Col, Container, Div, Input, Row } from 'atomize'
+import { useState } from 'react';
+import { } from 'antd';
 import './App.css';
 
 function App() {
   const [vals, setVals] = useState({
-    price: '',
-    down: '',
-    rate: '',
-    term: '',
+    price: '70000',
+    down: '20',
+    rate: '3.75',
+    term: '25',
     cc: '',
   })
   const amort = (pv, n, r) => {
@@ -23,9 +23,9 @@ function App() {
     for (let count = 0; count < n; ++count) {
       // collect the data
       const tableRow = {
-        month:0,
-        balance:'',
-        interest:'',
+        month: 0,
+        balance: '',
+        interest: '',
         monthlyPrincipal: '',
       };
 
@@ -58,10 +58,11 @@ function App() {
     return { payment: payment.toFixed(2), amortTable }
   }
   const parseInputs = (values) => {
-    const {rate, price, term} = values;
-    const parsedPrice = parseFloat(price)
-    const parsedRate = parseFloat(rate)/100.0
-    const parsedTerm = parseInt(term)*12
+    const { rate, price, term, down } = values;
+    const parsedDown = parseFloat(down) / 100 * price
+    const parsedPrice = parseFloat(price - parsedDown)
+    const parsedRate = parseFloat(rate) / 100
+    const parsedTerm = parseInt(term) * 12
     return {
       parsedTerm,
       parsedRate,
@@ -70,38 +71,73 @@ function App() {
   }
   const validateInputs = ([, val]) => !(val === null || val === '')
   const isTrue = (val) => val === true
-  const handleChange = e => setVals({...vals,[e.target.name]: e.target.value})
+  const handleChange = e => setVals({ ...vals, [e.target.name]: e.target.value })
   const calculate = () => {
     const validInputs = Object.entries(vals)
       .map(validateInputs)
       .some(isTrue)
     if (validInputs) {
       // do stuff
-      const {parsedPrice, parsedTerm, parsedRate} = parseInputs(vals)
-      const {payment, amortTable} = amort(parsedPrice, parsedTerm, parsedRate);
-      console.log({parsedPrice, parsedRate, parsedTerm, payment, amortTable})
+      const { parsedPrice, parsedTerm, parsedRate } = parseInputs(vals)
+      const { payment, amortTable } = amort(parsedPrice, parsedTerm, parsedRate);
+      console.log({ parsedPrice, parsedRate, parsedTerm, payment, amortTable })
     } else {
       return false
     }
   }
   return (
     <Container className="App">
-    <Div>
-      <header className="App-header">
-        <pre>{JSON.stringify(vals, null, 2)}</pre>
-        <Row>
-          <Col>
-          <label>Sale Price: </label></Col><Col><Input h="2rem" name="price" value={vals.price} onChange={handleChange} /></Col>
-
-        </Row>
-
-        <label>Downpayment %: <Input h="2rem" name="down" value={vals.down} onChange={handleChange} /></label>
-        <label>Interest %: <Input h="2rem" name="rate" value={vals.rate} onChange={handleChange} /></label>
-        <label>Term (yrs): <Input h="2rem" name="term" value={vals.term} onChange={handleChange} /></label>
-        <label>Closing Costs: <Input h="2rem" name="cc" value={vals.cc} onChange={handleChange} /></label>
-        <button onClick={calculate}>Calculate</button>
-      </header>
-    </Div>
+      <Radio.Group value={formLayout}>
+        <Radio.Button value="horizontal">Horizontal</Radio.Button>
+        <Radio.Button value="vertical">Vertical</Radio.Button>
+        <Radio.Button value="inline">Inline</Radio.Button>
+      </Radio.Group>
+      <Div>
+        <header className="App-header">
+          <pre>{JSON.stringify(vals, null, 2)}</pre>
+          <Row m={{ b: '1rem' }}>
+            <Col>
+              <label>Sale Price: </label>
+            </Col>
+            <Col>
+              <Input h="2rem" name="price" value={vals.price} onChange={handleChange} />
+            </Col>
+          </Row>
+          <Row m={{ b: '1rem' }}>
+            <Col>
+              <label>Downpayment %:</label>
+            </Col>
+            <Col>
+              <Input h="2rem" name="down" value={vals.down} onChange={handleChange} />
+            </Col>
+          </Row>
+          <Row m={{ b: '1rem' }}>
+            <Col>
+              <label>Interest %:</label>
+            </Col>
+            <Col>
+              <Input h="2rem" name="rate" value={vals.rate} onChange={handleChange} />
+            </Col>
+          </Row>
+          <Row m={{ b: '1rem' }}>
+            <Col>
+              <label>Term (yrs):</label>
+            </Col>
+            <Col>
+              <Input h="2rem" name="term" value={vals.term} onChange={handleChange} />
+            </Col>
+          </Row>
+          <Row m={{ b: '1rem' }}>
+            <Col>
+              <label>Closing Costs:</label>
+            </Col>
+            <Col>
+              <Input h="2rem" name="cc" value={vals.cc} onChange={handleChange} />
+            </Col>
+          </Row>
+          <button onClick={calculate}>Calculate</button>
+        </header>
+      </Div>
     </Container>
   );
 }
